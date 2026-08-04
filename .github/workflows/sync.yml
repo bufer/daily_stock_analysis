@@ -1,0 +1,39 @@
+name: Sync upstream main
+
+on:
+  schedule:
+    - cron: "0 8 * * *" # 每天北京时间16:00
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout current repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/ZhuLinsen/daily_stock_analysis.git
+          git fetch upstream
+
+      - name: Sync main from upstream
+        run: |
+          git checkout main
+          git reset --hard origin/main
+          git merge --no-edit -X theirs upstream/main || true
+
+      - name: Push to origin
+        run: |
+          git push origin main --force-with-lease
