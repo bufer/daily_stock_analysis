@@ -2,21 +2,18 @@ name: Sync upstream main
 
 on:
   schedule:
-    - cron: "0 8 * * *" # 每天北京时间16:00
+    - cron: "0 8 * * *"
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout current repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.SYNC_PAT }}
 
       - name: Configure git
         run: |
